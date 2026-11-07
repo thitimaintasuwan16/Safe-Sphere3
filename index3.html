@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeSphere Enterprise - Industrial Flood Risk & Supply Chain Continuity System</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#06b6d4',
+              600: '#0891b2',
+              700: '#0e7490',
+              900: '#164e63',
+            },
+            hazard: {
+              green: '#10b981',
+              yellow: '#f59e0b',
+              orange: '#f97316',
+              red: '#ef4444',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    
+    .radar-sweep {
+      transform-origin: center;
+      animation: sweep 4s linear infinite;
+    }
+    
+    @keyframes sweep {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .pulse-glow {
+      animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+  </style>
+</head>
+<body class="h-full font-sans antialiased bg-slate-950 text-slate-100 flex flex-col overflow-x-hidden">
+
+  <!-- Top Enterprise Navigation -->
+  <header class="bg-slate-900/90 border-b border-slate-800 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logo & System Name -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <i class="fa-solid fa-shield-halved text-white text-xl"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="font-bold text-lg tracking-tight text-white">SafeSphere</span>
+            <span class="px-2 py-0.5 text-xs font-semibold bg-cyan-950 text-cyan-400 border border-cyan-800 rounded-full">Enterprise v3.2</span>
+          </div>
+          <p class="text-xs text-slate-400">Industrial Flood Risk & Supply Chain Continuity System</p>
+        </div>
+      </div>
+
+      <!-- Real-Time Data Sync Toggle & Status -->
+      <div class="flex items-center space-x-4">
+        <!-- Live Data Sync Switch -->
+        <div class="hidden md:flex items-center space-x-3 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+          <span class="text-xs font-medium text-slate-300">
+            <i class="fa-solid fa-satellite-dish mr-1.5 text-cyan-400"></i> Real-time Sync (ThaiWater/GISTDA)
+          </span>
+          <button id="realtimeToggle" onclick="toggleRealtimeSync()" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-cyan-600" role="switch" aria-checked="true">
+            <span id="realtimeToggleKnob" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-5"></span>
+          </button>
+        </div>
+
+        <!-- Sync Indicator -->
+        <div class="flex items-center space-x-2 text-xs text-emerald-400 bg-emerald-950/50 border border-emerald-800/60 px-2.5 py-1 rounded-md">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span id="syncStatusText">LIVE: IoT Telemetry Active</span>
+        </div>
+
+        <!-- Plant Selector -->
+        <select class="bg-slate-800 border border-slate-700 text-xs rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-cyan-500">
+          <option>โรงงานหลัก: นิคมอุตสาหกรรมบางปู (HQ)</option>
+          <option>โรงงาน 2: นิคมอุตสาหกรรมอมตะซิตี้ ชลบุรี</option>
+          <option>โรงงาน 3: นิคมอุตสาหกรรมมาบตาพุด</option>
+        </select>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Navigation Tabs Bar -->
+  <nav class="bg-slate-900 border-b border-slate-800 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto flex space-x-2 overflow-x-auto py-2">
+      <button onclick="switchTab('radar')" id="tab-radar" class="tab-btn active px-4 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 bg-cyan-600 text-white transition-all">
+        <i class="fa-solid fa-radar"></i>
+        <span>Disaster Radar & IoT</span>
+      </button>
+
+      <button onclick="switchTab('simulator')" id="tab-simulator" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+        <i class="fa-solid fa-water"></i>
+        <span>Flood What-If Simulator</span>
+      </button>
+
+      <button onclick="switchTab('supply')" id="tab-supply" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+        <i class="fa-solid fa-route"></i>
+        <span>Logistics Route Hazards</span>
+      </button>
+
+      <button onclick="switchTab('bom')" id="tab-bom" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+        <i class="fa-solid fa-sitemap"></i>
+        <span>BOM & Line Revenue Impact</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+    <!-- KPI Summary Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Water Risk Level -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-center justify-between shadow-sm">
+        <div>
+          <p class="text-xs font-medium text-slate-400">ระดับความเสี่ยงน้ำท่วมปัจจุบัน</p>
+          <h3 id="kpi-risk-level" class="text-xl font-bold text-amber-400 mt-1">ปานกลาง (Level 2)</h3>
+          <p id="kpi-water-height" class="text-xs text-slate-400 mt-0.5">ระดับน้ำคลองสำโรง: +45 cm (เตือนภัย)</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+          <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+        </div>
+      </div>
+
+      <!-- Active IoT Telemetry Nodes -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-center justify-between shadow-sm">
+        <div>
+          <p class="text-xs font-medium text-slate-400">เซนเซอร์ IoT ภายนอก/ประตูน้ำ</p>
+          <h3 class="text-xl font-bold text-white mt-1">8 / 8 Node ทำงานปกติ</h3>
+          <p class="text-xs text-emerald-400 mt-0.5"><i class="fa-solid fa-check-circle mr-1"></i> ปั๊มน้ำสำรอง 4 ตัวพร้อมใช้</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+          <i class="fa-solid fa-tower-observation text-xl"></i>
+        </div>
+      </div>
+
+      <!-- Logistics Detour Hazard -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-center justify-between shadow-sm">
+        <div>
+          <p class="text-xs font-medium text-slate-400">เส้นทางขนส่งวิกฤต (Logistics Route)</p>
+          <h3 class="text-xl font-bold text-rose-400 mt-1">สาย 304 น้ำท่วมขัง</h3>
+          <p class="text-xs text-slate-400 mt-0.5">แนะนำเลี่ยงใช้: สาย 331 (+48 km)</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+          <i class="fa-solid fa-truck-fast text-xl"></i>
+        </div>
+      </div>
+
+      <!-- At-Risk Revenue Impact -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-center justify-between shadow-sm">
+        <div>
+          <p class="text-xs font-medium text-slate-400">ประเมินรายได้เสี่ยงกระทบสะสม</p>
+          <h3 id="kpi-revenue-loss" class="text-xl font-bold text-cyan-400 mt-1">฿ 14,250,000</h3>
+          <p class="text-xs text-slate-400 mt-0.5">สายการผลิต A1 & E2 (สต็อกเหลือ 3 วัน)</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+          <i class="fa-solid fa-sack-dollar text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 1: DISASTER RADAR & REAL-TIME IOT TELEMETRY -->
+    <section id="sec-radar" class="tab-content space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Radar Visual Area -->
+        <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-radar text-cyan-400"></i>
+              <h2 class="text-base font-bold text-white">Disaster Live Radar & Sensor Mapping</h2>
+            </div>
+            <span class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700">
+              พิกัด: นิคมบางปู (13.528, 100.689)
+            </span>
+          </div>
+
+          <!-- Radar Canvas Graphic -->
+          <div class="relative w-full h-80 sm:h-96 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden flex items-center justify-center">
+            
+            <!-- Radar Grid Circles -->
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div class="w-[90%] h-[90%] rounded-full border border-cyan-900/40 border-dashed"></div>
+              <div class="absolute w-[65%] h-[65%] rounded-full border border-cyan-800/50"></div>
+              <div class="absolute w-[40%] h-[40%] rounded-full border border-cyan-700/60"></div>
+              <div class="absolute w-[15%] h-[15%] rounded-full border border-cyan-500/80"></div>
+              <!-- Crosshairs -->
+              <div class="absolute w-full h-[1px] bg-cyan-900/40"></div>
+              <div class="absolute h-full w-[1px] bg-cyan-900/40"></div>
+            </div>
+
+            <!-- Radar Rotating Sweeper -->
+            <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+              <div class="w-full h-full radar-sweep bg-gradient-to-tr from-cyan-500/20 via-transparent to-transparent rounded-full"></div>
+            </div>
+
+            <!-- Factory HQ Marker (Center) -->
+            <div class="absolute z-20 flex flex-col items-center">
+              <div class="w-6 h-6 rounded-full bg-cyan-500 border-2 border-white flex items-center justify-center shadow-lg shadow-cyan-500/50 animate-pulse">
+                <i class="fa-solid fa-industry text-[10px] text-slate-950"></i>
+              </div>
+              <span class="text-[10px] font-bold bg-slate-900/90 text-cyan-300 px-1.5 py-0.5 rounded border border-cyan-800 mt-1">HQ Factory</span>
+            </div>
+
+            <!-- Sensor Node 1: Water Canal -->
+            <div class="absolute top-[25%] left-[30%] z-10 cursor-pointer group" onclick="showSensorModal('Node A1: ประตูน้ำคลองสำโรง')">
+              <div class="w-4 h-4 rounded-full bg-amber-500 border border-white flex items-center justify-center pulse-glow">
+                <span class="text-[8px] text-black font-bold">1</span>
+              </div>
+              <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block whitespace-nowrap bg-slate-900 text-xs px-2 py-1 rounded border border-slate-700 text-amber-300 shadow-xl">
+                ประตูน้ำคลองสำโรง (+45 cm)
+              </div>
+            </div>
+
+            <!-- Sensor Node 2: Rain Gauge North -->
+            <div class="absolute top-[18%] right-[28%] z-10 cursor-pointer group" onclick="showSensorModal('Node B2: สถานีวัดฝนเหนือน้ำ')">
+              <div class="w-4 h-4 rounded-full bg-rose-500 border border-white flex items-center justify-center pulse-glow">
+                <span class="text-[8px] text-white font-bold">2</span>
+              </div>
+              <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block whitespace-nowrap bg-slate-900 text-xs px-2 py-1 rounded border border-slate-700 text-rose-300 shadow-xl">
+                วัดฝนเหนือน้ำ (82 mm/hr - ฝนตกหนักมาก)
+              </div>
+            </div>
+
+            <!-- Sensor Node 3: Canal South -->
+            <div class="absolute bottom-[22%] right-[35%] z-10 cursor-pointer group" onclick="showSensorModal('Node C3: คลองชายทะเล')">
+              <div class="w-4 h-4 rounded-full bg-emerald-500 border border-white flex items-center justify-center">
+                <span class="text-[8px] text-black font-bold">3</span>
+              </div>
+              <div class="absolute top-full left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-slate-900 text-xs px-2 py-1 rounded border border-slate-700 text-emerald-300 shadow-xl">
+                คลองชายทะเล (ปกติ: +12 cm)
+              </div>
+            </div>
+
+            <!-- Threat Cloud Vector -->
+            <div class="absolute top-10 left-12 opacity-30 pointer-events-none">
+              <i class="fa-solid fa-cloud-showers-heavy text-slate-400 text-6xl"></i>
+              <span class="block text-[10px] text-slate-400">มรสุมกำลังเคลื่อนตัวเข้าทิศตะวันออกเฉียงเหนือ</span>
+            </div>
+
+            <!-- Map Controls / Legend Overlay -->
+            <div class="absolute bottom-3 left-3 bg-slate-900/90 p-2 rounded-lg border border-slate-800 text-[11px] space-y-1 z-20">
+              <div class="flex items-center space-x-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span class="text-slate-300">ปกติ (0 - 20 cm)</span></div>
+              <div class="flex items-center space-x-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span><span class="text-slate-300">เฝ้าระวัง (21 - 50 cm)</span></div>
+              <div class="flex items-center space-x-2"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span><span class="text-slate-300">วิกฤต (> 50 cm)</span></div>
+            </div>
+          </div>
+
+          <!-- Weather Feed Summary -->
+          <div class="grid grid-cols-3 gap-3 pt-2">
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+              <span class="text-xs text-slate-400 block">ปริมาณฝนสะสม (24 ชม.)</span>
+              <span class="text-lg font-bold text-cyan-400">114.5 mm</span>
+              <span class="text-[10px] text-rose-400 block mt-0.5"><i class="fa-solid fa-arrow-up"></i> สูงกว่าค่าเฉลี่ย 42%</span>
+            </div>
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+              <span class="text-xs text-slate-400 block">อัตราการระบายน้ำหนองงูเห่า</span>
+              <span class="text-lg font-bold text-white">45.2 ลบ.ม./วินาที</span>
+              <span class="text-[10px] text-amber-400 block mt-0.5">ความจุลำน้ำ 85%</span>
+            </div>
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+              <span class="text-xs text-slate-400 block">ระดับน้ำทะเลหนุนสูงสุด</span>
+              <span class="text-lg font-bold text-amber-400">+1.85 m.รทก.</span>
+              <span class="text-[10px] text-slate-400 block mt-0.5">คาดการณ์เวลา 18:30 น.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry Sensors Live List -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-microchip text-cyan-400"></i>
+              IoT Telemetry Node Feed
+            </h3>
+            <span class="text-xs text-slate-400">8 Node Active</span>
+          </div>
+
+          <div class="space-y-3 overflow-y-auto max-h-[380px] pr-1">
+            <!-- Node Item 1 -->
+            <div class="p-3 bg-slate-950 rounded-xl border border-amber-500/30 flex items-center justify-between hover:border-amber-500 transition-colors">
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span class="font-semibold text-xs text-slate-200">ประตูน้ำคลองสำโรง (Gate #1)</span>
+                  <span class="bg-amber-950 text-amber-400 border border-amber-800 text-[10px] px-1.5 py-0.2 rounded">เตือนภัย</span>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">Ultrasonic Sensor: <span class="text-amber-400 font-bold">+45 cm</span> (เกณฑ์เตือน +40)</p>
+                <p class="text-[10px] text-slate-500 mt-0.5">อัปเดตล่าสุด: 1 นาทีที่แล้ว • แบตเตอรี่ 98%</p>
+              </div>
+              <button onclick="togglePump('Gate #1')" class="px-2.5 py-1 text-xs bg-amber-600 hover:bg-amber-500 text-white rounded-lg transition">
+                เปิดปั๊มสูบ
+              </button>
+            </div>
+
+            <!-- Node Item 2 -->
+            <div class="p-3 bg-slate-950 rounded-xl border border-rose-500/30 flex items-center justify-between hover:border-rose-500 transition-colors">
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span class="font-semibold text-xs text-slate-200">สถานีวัดฝนเหนือน้ำ (North Gauge)</span>
+                  <span class="bg-rose-950 text-rose-400 border border-rose-800 text-[10px] px-1.5 py-0.2 rounded">วิกฤต</span>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">อัตราฝน: <span class="text-rose-400 font-bold">82 mm/hr</span> (หนักมาก)</p>
+                <p class="text-[10px] text-slate-500 mt-0.5">อัปเดตล่าสุด: เมื่อครู่ • Solar Powered</p>
+              </div>
+              <button onclick="showAlert('เตือนภัยระดับน้ำสถิตเหนือโรงงานวิกฤต')" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700">
+                ดูสถิติ
+              </button>
+            </div>
+
+            <!-- Node Item 3 -->
+            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition-colors">
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span class="font-semibold text-xs text-slate-200">คันกั้นน้ำทิศตะวันออก (Dike #4)</span>
+                  <span class="bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] px-1.5 py-0.2 rounded">ปกติ</span>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">แรงดันคันกั้นน้ำ: <span class="text-emerald-400 font-bold">12 kPa</span> (ปกติ)</p>
+                <p class="text-[10px] text-slate-500 mt-0.5">อัปเดตล่าสุด: 3 นาทีที่แล้ว</p>
+              </div>
+              <span class="text-xs text-emerald-400 font-medium">สภาวะปกติ</span>
+            </div>
+
+            <!-- Node Item 4 -->
+            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition-colors">
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span class="font-semibold text-xs text-slate-200">ท่อระบายน้ำหลักโรงงาน (Drain #A)</span>
+                  <span class="bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] px-1.5 py-0.2 rounded">ปกติ</span>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">การไหล: <span class="text-cyan-400 font-bold">1.4 m/s</span></p>
+                <p class="text-[10px] text-slate-500 mt-0.5">อัปเดตล่าสุด: 2 นาทีที่แล้ว</p>
+              </div>
+              <span class="text-xs text-emerald-400 font-medium">สภาวะปกติ</span>
+            </div>
+          </div>
+
+          <!-- Quick Command Action -->
+          <button onclick="triggerEmergencyProtocol()" class="w-full py-2.5 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-bell-concierge"></i>
+            <span>ประกาศเตือนภัยเตรียมยกของขึ้นที่สูง (Level 2)</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: FLOOD WHAT-IF SIMULATOR WITH REAL-TIME CALIBRATION -->
+    <section id="sec-simulator" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Controls Panel -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-5">
+          <div class="flex items-center space-x-2 border-b border-slate-800 pb-3">
+            <i class="fa-solid fa-sliders text-cyan-400"></i>
+            <h2 class="text-base font-bold text-white">ตั้งค่าจำลองระดับน้ำ (What-If Parameters)</h2>
+          </div>
+
+          <!-- Slider 1: Water Height -->
+          <div class="space-y-2">
+            <div class="flex justify-between text-xs">
+              <label class="text-slate-300 font-medium">ระดับน้ำท่วมขัง (+cm):</label>
+              <span id="val-water-height" class="text-cyan-400 font-bold text-sm">+45 cm</span>
+            </div>
+            <input type="range" id="sim-water-height" min="0" max="150" value="45" oninput="updateSimulation()" class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-cyan-500">
+            <div class="flex justify-between text-[10px] text-slate-500">
+              <span>0 cm (ปกติ)</span>
+              <span>50 cm (วิกฤต)</span>
+              <span>150 cm (วินาศภัย)</span>
+            </div>
+          </div>
+
+          <!-- Slider 2: Flood Duration -->
+          <div class="space-y-2">
+            <div class="flex justify-between text-xs">
+              <label class="text-slate-300 font-medium">ระยะเวลาท่วมขัง (วัน):</label>
+              <span id="val-duration" class="text-cyan-400 font-bold text-sm">3 วัน</span>
+            </div>
+            <input type="range" id="sim-duration" min="1" max="14" value="3" oninput="updateSimulation()" class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-cyan-500">
+          </div>
+
+          <!-- Slider 3: Rainfall Intensity -->
+          <div class="space-y-2">
+            <div class="flex justify-between text-xs">
+              <label class="text-slate-300 font-medium">ความเข้มฝนสะสม (mm/hr):</label>
+              <span id="val-rain" class="text-cyan-400 font-bold text-sm">80 mm/hr</span>
+            </div>
+            <input type="range" id="sim-rain" min="10" max="200" value="80" oninput="updateSimulation()" class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-cyan-500">
+          </div>
+
+          <!-- Select Dam Release -->
+          <div class="space-y-2">
+            <label class="text-xs text-slate-300 font-medium block">การปล่อยน้ำจากเขื่อนเจ้าพระยา/ป่าสัก:</label>
+            <select id="sim-dam" onchange="updateSimulation()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:border-cyan-500">
+              <option value="normal">ปกติ (1,200 ลบ.ม./วิ)</option>
+              <option value="high" selected>สูง (2,200 ลบ.ม./วิ - เฝ้าระวัง)</option>
+              <option value="extreme">วิกฤตสุดขีด (> 3,000 ลบ.ม./วิ)</option>
+            </select>
+          </div>
+
+          <!-- Impact Summary Box -->
+          <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+            <span class="text-xs text-slate-400 block font-medium">ประมาณการมูลค่าความเสียหายรวม:</span>
+            <span id="sim-total-loss" class="text-2xl font-extrabold text-rose-400 block">฿ 18,400,000</span>
+            <p class="text-[11px] text-slate-400">คำนวณจาก: เครื่องจักร + วัตถุดิบ + ค่าเสียโอกาสการผลิต + ค่าขนส่งเลี่ยง</p>
+          </div>
+        </div>
+
+        <!-- Cross-Section Elevation Graphic & Zone Status -->
+        <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-layer-group text-cyan-400"></i>
+              Factory Elevation & Cross-Section Impact Model
+            </h3>
+            <span class="text-xs text-cyan-400 bg-cyan-950 px-2 py-1 rounded border border-cyan-800">ระดับพื้นโรงงาน: +1.20 m.รทก.</span>
+          </div>
+
+          <!-- Dynamic Visual Factory Cross-Section -->
+          <div class="relative w-full h-64 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden flex items-end p-4">
+            
+            <!-- Dynamic Water Layer -->
+            <div id="visual-water-layer" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-cyan-600/80 to-blue-500/50 transition-all duration-500 border-t-2 border-cyan-300 z-10" style="height: 30%;">
+              <div class="w-full text-right pr-3 pt-1 text-[10px] text-cyan-200 font-bold">
+                <i class="fa-solid fa-water"></i> ระดับน้ำจำลอง
+              </div>
+            </div>
+
+            <!-- Factory Building Diagram Elements -->
+            <div class="relative z-20 w-full grid grid-cols-4 gap-2 items-end h-full pt-6">
+              
+              <!-- Zone A: Warehouse Floor -->
+              <div class="bg-slate-800/90 border border-slate-700 rounded-t-lg p-2 h-[80%] flex flex-col justify-between">
+                <div>
+                  <span class="text-[10px] font-bold text-slate-300 block">คลังวัตถุดิบ (Raw Material)</span>
+                  <span class="text-[9px] text-slate-400">ยกสูง: +20 cm</span>
+                </div>
+                <div id="zone-a-status" class="text-xs font-semibold px-2 py-1 rounded bg-emerald-950 text-emerald-400 text-center border border-emerald-800">
+                  ปลอดภัย
+                </div>
+              </div>
+
+              <!-- Zone B: Production Line 1 -->
+              <div class="bg-slate-800/90 border border-slate-700 rounded-t-lg p-2 h-[65%] flex flex-col justify-between">
+                <div>
+                  <span class="text-[10px] font-bold text-slate-300 block">สายการผลิต A1 (Precision PLC)</span>
+                  <span class="text-[9px] text-slate-400">ระดับพื้น: 0 cm</span>
+                </div>
+                <div id="zone-b-status" class="text-xs font-semibold px-2 py-1 rounded bg-amber-950 text-amber-400 text-center border border-amber-800">
+                  เฝ้าระวัง
+                </div>
+              </div>
+
+              <!-- Zone C: Finished Goods -->
+              <div class="bg-slate-800/90 border border-slate-700 rounded-t-lg p-2 h-[90%] flex flex-col justify-between">
+                <div>
+                  <span class="text-[10px] font-bold text-slate-300 block">คลังสินค้าสำเร็จรูป (FG)</span>
+                  <span class="text-[9px] text-slate-400">ยกสูง: +60 cm</span>
+                </div>
+                <div id="zone-c-status" class="text-xs font-semibold px-2 py-1 rounded bg-emerald-950 text-emerald-400 text-center border border-emerald-800">
+                  ปลอดภัย
+                </div>
+              </div>
+
+              <!-- Zone D: Power Substation -->
+              <div class="bg-slate-800/90 border border-slate-700 rounded-t-lg p-2 h-[50%] flex flex-col justify-between">
+                <div>
+                  <span class="text-[10px] font-bold text-slate-300 block">ห้องจ่ายไฟฟ้าหลัก (Substation)</span>
+                  <span class="text-[9px] text-slate-400">ระดับพื้น: +15 cm</span>
+                </div>
+                <div id="zone-d-status" class="text-xs font-semibold px-2 py-1 rounded bg-rose-950 text-rose-400 text-center border border-rose-800">
+                  วิกฤต ท่วมถึง
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Detailed Impact Breakdown Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left text-slate-300">
+              <thead class="bg-slate-950 text-slate-400 uppercase font-medium border-b border-slate-800">
+                <tr>
+                  <th class="p-2.5">หมวดหมู่ทรัพย์สิน</th>
+                  <th class="p-2.5">มูลค่าทรัพย์สินเสี่ยง</th>
+                  <th class="p-2.5">ระดับน้ำกระทบ</th>
+                  <th class="p-2.5">สถานะ / มาตรการป้องกัน</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800">
+                <tr>
+                  <td class="p-2.5 font-semibold text-white">เครื่องจักร Precision CNC Line 1-3</td>
+                  <td class="p-2.5">฿ 45,000,000</td>
+                  <td class="p-2.5 text-amber-400">+35 cm ถึงฐานเครื่อง</td>
+                  <td class="p-2.5"><span class="text-amber-400">เตรียมติดตั้งไดม์กั้นน้ำ + ปั๊มจม Submersible</span></td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-semibold text-white">วัตถุดิบ Microchip & PCB Stock</td>
+                  <td class="p-2.5">฿ 12,800,000</td>
+                  <td class="p-2.5 text-emerald-400">ปลอดภัย (อยู่ชั้น Racking 2)</td>
+                  <td class="p-2.5"><span class="text-emerald-400">ย้ายขึ้น Rack สูงเรียบร้อย</span></td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-semibold text-white">ตู้ควบคุมระบบไฟฟ้า Main Breaker</td>
+                  <td class="p-2.5">฿ 8,500,000</td>
+                  <td class="p-2.5 text-rose-400">+10 cm ท่วมแผงล่าง</td>
+                  <td class="p-2.5"><span class="text-rose-400">ต้องสั่ง Emergency Shutdown หากน้ำเกิน +30 cm</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 3: LOGISTICS ROUTE HAZARD & ALTERNATIVE ROUTING ANALYSIS -->
+    <section id="sec-supply" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Logistics Map Display -->
+        <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-map-location-dot text-cyan-400"></i>
+              <h2 class="text-base font-bold text-white">วิเคราะห์เส้นทางขนส่งวัตถุดิบ & จุดเสี่ยงน้ำท่วมถนน</h2>
+            </div>
+            <span class="text-xs bg-rose-950 text-rose-300 border border-rose-800 px-2.5 py-1 rounded-md">
+              <i class="fa-solid fa-triangle-exclamation mr-1"></i> แจ้งเตือน: ถนนสาย 304 ท่วมขัง 40 cm
+            </span>
+          </div>
+
+          <!-- Visual Route Map Graphic -->
+          <div class="relative w-full h-80 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden p-4 flex flex-col justify-between">
+            
+            <!-- Map Background Grid Pattern -->
+            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]"></div>
+
+            <!-- Visual Nodes and Route Lines -->
+            <div class="relative z-10 h-full flex flex-col justify-between py-2">
+              
+              <!-- Top Row: Suppliers -->
+              <div class="flex justify-between items-center px-6">
+                <!-- Supplier A -->
+                <div class="bg-slate-900 border border-slate-700 p-2.5 rounded-xl shadow-lg flex items-center space-x-3 cursor-pointer hover:border-cyan-500" onclick="selectRouteSupplier('SuppA')">
+                  <div class="w-8 h-8 rounded-lg bg-indigo-600/30 text-indigo-400 flex items-center justify-center font-bold text-xs">
+                    Supp A
+                  </div>
+                  <div>
+                    <span class="text-xs font-bold text-white block">Siam Microtech (ฉะเชิงเทรา)</span>
+                    <span class="text-[10px] text-slate-400">ส่งมอบ: ชิป Microcontroller</span>
+                  </div>
+                </div>
+
+                <!-- Supplier B -->
+                <div class="bg-slate-900 border border-slate-700 p-2.5 rounded-xl shadow-lg flex items-center space-x-3 cursor-pointer hover:border-cyan-500" onclick="selectRouteSupplier('SuppB')">
+                  <div class="w-8 h-8 rounded-lg bg-teal-600/30 text-teal-400 flex items-center justify-center font-bold text-xs">
+                    Supp B
+                  </div>
+                  <div>
+                    <span class="text-xs font-bold text-white block">Eastern Steel (ระยอง)</span>
+                    <span class="text-[10px] text-slate-400">ส่งมอบ: แผ่นเหล็กโครงสร้าง</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Middle Row: Highway Routes & Hazards -->
+              <div class="my-auto px-12 relative py-4">
+                <!-- Primary Highway 304 (Flooded) -->
+                <div class="border-t-2 border-dashed border-rose-500/80 relative flex items-center justify-center my-4">
+                  <span class="bg-rose-950 text-rose-300 border border-rose-800 text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">
+                    <i class="fa-solid fa-water mr-1"></i> ถนนสายหลัก 304 (ท่วมขังวิกฤต - รถบรรทุกเล็กผ่านไม่ได้)
+                  </span>
+                </div>
+
+                <!-- Bypass Route 331 (Recommended) -->
+                <div class="border-t-2 border-emerald-500/80 relative flex items-center justify-center my-4">
+                  <span class="bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">
+                    <i class="fa-solid fa-circle-check mr-1"></i> เส้นทางเลี่ยงแนะนำ: ทางหลวง 331 ➔ ทางหลวง 36 (สภาวะปกติ)
+                  </span>
+                </div>
+              </div>
+
+              <!-- Bottom Row: Factory Destination HQ -->
+              <div class="flex justify-center">
+                <div class="bg-cyan-950 border-2 border-cyan-500 p-3 rounded-xl shadow-xl flex items-center space-x-3 max-w-sm w-full">
+                  <div class="w-10 h-10 rounded-lg bg-cyan-600 text-slate-950 flex items-center justify-center font-extrabold text-lg">
+                    <i class="fa-solid fa-industry"></i>
+                  </div>
+                  <div>
+                    <span class="text-xs font-bold text-white block">โรงงานปลายทาง: SafeSphere HQ (นิคมบางปู)</span>
+                    <span class="text-[10px] text-cyan-300">จุดรับสินค้าประตู 2 (Receiving Dock B)</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Dynamic Logistics Recommendation Card -->
+          <div id="route-recommendation-card" class="bg-slate-950 p-4 rounded-xl border border-cyan-800/60 flex items-start space-x-4">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 flex-shrink-0 mt-0.5">
+              <i class="fa-solid fa-route text-lg"></i>
+            </div>
+            <div class="space-y-1">
+              <h4 class="text-xs font-bold text-white">คำแนะนำเส้นทางเลี่ยง (Dynamic Bypass Routing Intelligence)</h4>
+              <p class="text-xs text-slate-300">
+                เนื่องจากน้ำท่วมขังบนถนนสาย 304 สูง 40 cm ระบบแนะนำให้เปลี่ยนเส้นทางขนส่งจาก <span class="text-rose-400 font-semibold">Siam Microtech</span> ไปใช้ <span class="text-emerald-400 font-semibold">ทางหลวง 331</span> แทน เพื่อป้องกันวัตถุดียึดล่าช้า
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Extra Cost & Logistics Impact Calculator -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-5">
+          <div class="border-b border-slate-800 pb-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-calculator text-cyan-400"></i>
+              ประเมินค่าขนส่งเพิ่มเติม (Extra Surge Cost)
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">คำนวณจากระยะทางเลี่ยงและเวลาส่งมอบที่เพิ่มขึ้น</p>
+          </div>
+
+          <!-- Route Data Stats -->
+          <div class="space-y-3">
+            <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-800">
+              <span class="text-slate-400">เส้นทางปกติ (สาย 304):</span>
+              <span class="font-semibold text-slate-200">85 km (1 ชม. 20 นาที)</span>
+            </div>
+            <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-800">
+              <span class="text-slate-400">เส้นทางเลี่ยง (สาย 331):</span>
+              <span class="font-semibold text-emerald-400">133 km (2 ชม. 10 นาที)</span>
+            </div>
+            <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-800">
+              <span class="text-slate-400">ระยะทางเพิ่มขึ้น (Detour):</span>
+              <span class="font-bold text-amber-400">+48 km (+50 นาที)</span>
+            </div>
+            <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-800">
+              <span class="text-slate-400">จำนวนเที่ยวขนส่ง/เดือน:</span>
+              <span class="font-semibold text-slate-200">45 เที่ยว</span>
+            </div>
+          </div>
+
+          <!-- Cost Breakdown Card -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+            <span class="text-xs font-bold text-slate-300 block">สรุปภาระค่าใช้จ่ายขนส่งส่วนเพิ่ม:</span>
+            
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-400">ค่าน้ำมันส่วนเพิ่ม/เที่ยว:</span>
+              <span class="text-white font-medium">฿ 1,150</span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-400">ค่าเบี้ยเลี้ยงคนขับ & OT:</span>
+              <span class="text-white font-medium">฿ 650</span>
+            </div>
+            <div class="flex justify-between text-xs border-t border-slate-800 pt-2 font-bold">
+              <span class="text-cyan-400">ค่าใช้จ่ายเพิ่มต่อเที่ยว:</span>
+              <span class="text-cyan-400">฿ 1,800 / เที่ยว</span>
+            </div>
+            <div class="flex justify-between text-sm border-t border-slate-800 pt-2 font-extrabold">
+              <span class="text-rose-400">ผลกระทบงบประมาณรวม/เดือน:</span>
+              <span class="text-rose-400">฿ 81,000</span>
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <button onclick="showAlert('ส่งแผนเส้นทางเลี่ยงใหม่อัตโนมัติไปยังระบบ Fleet Management เรียบร้อยแล้ว')" class="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-share-nodes"></i>
+            <span>ส่งข้อมูลเส้นทางให้ทีมขนส่ง (Fleet Dispatch)</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 4: BILL OF MATERIALS (BOM) & PRODUCTION LINE REVENUE IMPACT -->
+    <section id="sec-bom" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Scenario Analysis Control -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-5">
+          <div class="border-b border-slate-800 pb-3">
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-sitemap text-cyan-400"></i>
+              จำลองซัพพลายเออร์หยุดส่งมอบ (BOM Cutoff Scenario)
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">เลือกซัพพลายเออร์เพื่อวิเคราะห์ผลกระทบต่อสายการผลิตและรายได้</p>
+          </div>
+
+          <!-- Supplier Selector Dropdown -->
+          <div class="space-y-2">
+            <label class="text-xs font-medium text-slate-300 block">เลือกซัพพลายเออร์วิกฤต:</label>
+            <select id="bom-supplier-select" onchange="analyzeBOMImpact()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:border-cyan-500">
+              <option value="suppA">Supplier A: Siam Microtech (ชิป MCU)</option>
+              <option value="suppB">Supplier B: Eastern Steel (แผ่นเหล็ก)</option>
+              <option value="suppC">Supplier C: Thai Polymer (เม็ดพลาสติก)</option>
+            </select>
+          </div>
+
+          <!-- Days of Failure Slider -->
+          <div class="space-y-2">
+            <div class="flex justify-between text-xs">
+              <label class="text-slate-300 font-medium">คาดการณ์หยุดส่งมอบ (วัน):</label>
+              <span id="val-cutoff-days" class="text-rose-400 font-bold">5 วัน</span>
+            </div>
+            <input type="range" id="cutoff-days-range" min="1" max="30" value="5" oninput="analyzeBOMImpact()" class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-rose-500">
+          </div>
+
+          <!-- Dynamic Results Summary Box -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-rose-900/50 space-y-3">
+            <span class="text-xs font-bold text-rose-300 block border-b border-slate-800 pb-1.5">
+              <i class="fa-solid fa-chart-line mr-1"></i> ประเมินผลกระทบรายได้สุทธิ
+            </span>
+
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-400">สต็อกวัตถุดิบรองรับได้ (Buffer):</span>
+              <span id="res-buffer-stock" class="text-amber-400 font-bold">3 วัน</span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-400">จำนวนวันที่สายการผลิตต้องหยุด:</span>
+              <span id="res-stop-days" class="text-rose-400 font-bold">2 วัน</span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-400">รายได้สูญเสียต่อวัน:</span>
+              <span id="res-daily-loss" class="text-white font-medium">฿ 2,500,000</span>
+            </div>
+            <div class="flex justify-between text-sm border-t border-slate-800 pt-2 font-extrabold">
+              <span class="text-rose-400">มูลค่ารายได้สูญเสียสะสม:</span>
+              <span id="res-total-loss" class="text-rose-400">฿ 5,000,000</span>
+            </div>
+          </div>
+
+          <!-- Recommended Mitigation Strategy -->
+          <div id="mitigation-recommendation" class="bg-cyan-950/60 p-3.5 rounded-xl border border-cyan-800 text-xs space-y-1">
+            <span class="font-bold text-cyan-300 block"><i class="fa-solid fa-lightbulb mr-1"></i> ข้อเสนอแนะบรรเทาผลกระทบ (Mitigation):</span>
+            <p id="mitigation-text" class="text-slate-300">
+              อนุมัติจัดซื้อด่วนจากซัพพลายเออร์สำรอง (Backup Supplier: Taiwan Micro Inc.) โดยยอมรับส่วนต่างราคา +8% เพื่อป้องกันสายการผลิตหยุดชะงัก
+            </p>
+          </div>
+        </div>
+
+        <!-- Affected Production Lines & BOM Impact Mapping -->
+        <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-diagram-project text-cyan-400"></i>
+              แผนผังเชื่อมโยง BOM ➔ สายการผลิต ➔ ผลิตภัณฑ์ปลายทาง
+            </h3>
+            <span class="text-xs text-slate-400">Mapping Live Matrix</span>
+          </div>
+
+          <!-- Interactive Mapping Cards -->
+          <div class="space-y-4">
+            
+            <!-- Component 1 Mapping -->
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+              <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                  <span class="text-xs font-bold text-white">วัตถุดิบ: Microcontroller Unit (MCU-32bit)</span>
+                </div>
+                <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Part #MCU-8841</span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                  <span class="text-slate-400 block text-[10px]">สายการผลิตที่ใช้ชิ้นส่วนนี้:</span>
+                  <span class="font-bold text-amber-300">Line A1: กล่องควบคุมยานยนต์ (ECU)</span>
+                  <p class="text-[10px] text-slate-400 mt-1">กำลังการผลิต: 1,200 ชิ้น/วัน</p>
+                </div>
+                <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                  <span class="text-slate-400 block text-[10px]">สินค้าสำเร็จรูปที่กระทบ:</span>
+                  <span class="font-bold text-white">Auto ECU Module Model-X</span>
+                  <p class="text-[10px] text-emerald-400 mt-1">ราคาขาย: ฿ 3,500 / ชิ้น</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Component 2 Mapping -->
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+              <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span>
+                  <span class="text-xs font-bold text-white">วัตถุดิบ: แผ่นเหล็กซิงค์ (Galvanized Steel Sheet)</span>
+                </div>
+                <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Part #ST-200</span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                  <span class="text-slate-400 block text-[10px]">สายการผลิตที่ใช้ชิ้นส่วนนี้:</span>
+                  <span class="font-bold text-slate-200">Line B2: โครงตู้ควบคุมไฟฟ้า</span>
+                  <p class="text-[10px] text-slate-400 mt-1">กำลังการผลิต: 300 ชุด/วัน</p>
+                </div>
+                <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                  <span class="text-slate-400 block text-[10px]">สินค้าสำเร็จรูปที่กระทบ:</span>
+                  <span class="font-bold text-white">Industrial Switchboard Enclosure</span>
+                  <p class="text-[10px] text-emerald-400 mt-1">ราคาขาย: ฿ 12,000 / ชุด</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Executive Action Button Row -->
+          <div class="pt-2 flex flex-wrap gap-3">
+            <button onclick="showAlert('ออกใบสั่งซื้อด่วน (Urgent PO) ไปยัง Supplier สำรองเรียบร้อยแล้ว')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition">
+              <i class="fa-solid fa-cart-plus mr-1.5"></i> ออกใบสั่งซื้อด่วนซัพพลายเออร์สำรอง
+            </button>
+            <button onclick="showAlert('ส่งรายงานวิเคราะห์ความเสี่ยง BOM เข้าที่ประชุมบริหารเรียบร้อย')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl border border-slate-700 transition">
+              <i class="fa-solid fa-file-pdf mr-1.5"></i> Export BOM Risk Report (PDF)
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Notification / Alert Modal -->
+  <div id="app-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+      <div class="flex items-center space-x-3 text-cyan-400">
+        <i class="fa-solid fa-circle-info text-2xl"></i>
+        <h3 class="text-base font-bold text-white">การแจ้งเตือนระบบ (SafeSphere Alert)</h3>
+      </div>
+      <p id="modal-message" class="text-xs text-slate-300 leading-relaxed">
+        ข้อความแจ้งเตือนระบบ...
+      </p>
+      <div class="flex justify-end">
+        <button onclick="closeModal()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs rounded-xl transition">
+          ตกลง / ยืนยัน
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footers -->
+  <footer class="bg-slate-900 border-t border-slate-800 py-4 px-4 text-center text-xs text-slate-500">
+    <p>© 2026 SafeSphere Enterprise Platform. Powered by Real-time IoT & Supply Chain Resiliency Analytics.</p>
+  </footer>
+
+  <!-- Embedded JavaScript Logic -->
+  <script>
+    // State management
+    let isRealtimeActive = true;
+    let realtimeTimer = null;
+
+    // Tab Switching Functionality
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-cyan-600', 'text-white');
+        btn.classList.add('text-slate-400', 'hover:text-white', 'hover:bg-slate-800');
+      });
+
+      document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      activeBtn.classList.add('bg-cyan-600', 'text-white');
+      activeBtn.classList.remove('text-slate-400', 'hover:text-white', 'hover:bg-slate-800');
+    }
+
+    // Toggle Realtime Data Sync Switch
+    function toggleRealtimeSync() {
+      isRealtimeActive = !isRealtimeActive;
+      const toggleBtn = document.getElementById('realtimeToggle');
+      const knob = document.getElementById('realtimeToggleKnob');
+      const statusText = document.getElementById('syncStatusText');
+
+      if (isRealtimeActive) {
+        toggleBtn.classList.replace('bg-slate-700', 'bg-cyan-600');
+        knob.classList.replace('translate-x-0', 'translate-x-5');
+        statusText.innerText = 'LIVE: IoT Telemetry Active';
+        startRealtimeSimulation();
+      } else {
+        toggleBtn.classList.replace('bg-cyan-600', 'bg-slate-700');
+        knob.classList.replace('translate-x-5', 'translate-x-0');
+        statusText.innerText = 'PAUSED: Static Mode';
+        clearInterval(realtimeTimer);
+      }
+    }
+
+    // Start Live Fluctuation Simulation for Sensors
+    function startRealtimeSimulation() {
+      if (realtimeTimer) clearInterval(realtimeTimer);
+      realtimeTimer = setInterval(() => {
+        if (!isRealtimeActive) return;
+        
+        // Random slight fluctuation for telemetry
+        const randomHeightDelta = Math.floor(Math.random() * 5) - 2;
+        const currentSimVal = parseInt(document.getElementById('sim-water-height').value);
+        const newVal = Math.max(10, Math.min(120, currentSimVal + randomHeightDelta));
+        
+        document.getElementById('sim-water-height').value = newVal;
+        updateSimulation();
+      }, 4000);
+    }
+
+    // Update Flood What-If Simulator Graphic & Calculations
+    function updateSimulation() {
+      const height = parseInt(document.getElementById('sim-water-height').value);
+      const duration = parseInt(document.getElementById('sim-duration').value);
+      const rain = parseInt(document.getElementById('sim-rain').value);
+
+      // Update UI Labels
+      document.getElementById('val-water-height').innerText = `+${height} cm`;
+      document.getElementById('val-duration').innerText = `${duration} วัน`;
+      document.getElementById('val-rain').innerText = `${rain} mm/hr`;
+
+      // Update Cross-section Visual Water Height Percentage
+      const waterLayer = document.getElementById('visual-water-layer');
+      const waterPct = Math.min(85, Math.max(5, (height / 120) * 100));
+      waterLayer.style.height = `${waterPct}%`;
+
+      // Calculate Total Estimated Financial Loss
+      const machineLoss = height > 30 ? 12000000 : (height > 10 ? 2500000 : 0);
+      const rawMatLoss = height > 50 ? 5000000 : 0;
+      const downtimeLoss = duration * 1800000;
+      const totalLoss = machineLoss + rawMatLoss + downtimeLoss;
+
+      document.getElementById('sim-total-loss').innerText = `฿ ${totalLoss.toLocaleString()}`;
+
+      // Update Factory Zones Status
+      const zoneA = document.getElementById('zone-a-status');
+      const zoneB = document.getElementById('zone-b-status');
+      const zoneD = document.getElementById('zone-d-status');
+
+      if (height > 50) {
+        zoneA.className = "text-xs font-semibold px-2 py-1 rounded bg-rose-950 text-rose-400 text-center border border-rose-800";
+        zoneA.innerText = "วิกฤต ท่วมถึง";
+      } else {
+        zoneA.className = "text-xs font-semibold px-2 py-1 rounded bg-emerald-950 text-emerald-400 text-center border border-emerald-800";
+        zoneA.innerText = "ปลอดภัย";
+      }
+
+      if (height > 25) {
+        zoneB.className = "text-xs font-semibold px-2 py-1 rounded bg-rose-950 text-rose-400 text-center border border-rose-800";
+        zoneB.innerText = "วิกฤต หยุดการผลิต";
+      } else {
+        zoneB.className = "text-xs font-semibold px-2 py-1 rounded bg-amber-950 text-amber-400 text-center border border-amber-800";
+        zoneB.innerText = "เฝ้าระวัง";
+      }
+
+      if (height > 15) {
+        zoneD.className = "text-xs font-semibold px-2 py-1 rounded bg-rose-950 text-rose-400 text-center border border-rose-800";
+        zoneD.innerText = "วิกฤต ท่วมถึง";
+      } else {
+        zoneD.className = "text-xs font-semibold px-2 py-1 rounded bg-emerald-950 text-emerald-400 text-center border border-emerald-800";
+        zoneD.innerText = "ปกติ";
+      }
+    }
+
+    // Interactive Route Supplier Selection
+    function selectRouteSupplier(suppKey) {
+      const recCard = document.getElementById('route-recommendation-card');
+      if (suppKey === 'SuppA') {
+        recCard.innerHTML = `
+          <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 flex-shrink-0 mt-0.5">
+            <i class="fa-solid fa-microchip text-lg"></i>
+          </div>
+          <div class="space-y-1">
+            <h4 class="text-xs font-bold text-white">เส้นทาง Siam Microtech (ฉะเชิงเทรา ➔ บางปู)</h4>
+            <p class="text-xs text-slate-300">
+              ถนนสาย 304 ท่วมขัง แนะนำเลี่ยงไปใช้ <span class="text-emerald-400 font-semibold">ทางหลวง 331</span> ระยะทางเพิ่มขึ้น +48 km แต่รับประกันการส่งมอบชิปไม่ล่าช้า
+            </p>
+          </div>
+        `;
+      } else {
+        recCard.innerHTML = `
+          <div class="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 flex-shrink-0 mt-0.5">
+            <i class="fa-solid fa-sheet-plastic text-lg"></i>
+          </div>
+          <div class="space-y-1">
+            <h4 class="text-xs font-bold text-white">เส้นทาง Eastern Steel (ระยอง ➔ บางปู)</h4>
+            <p class="text-xs text-slate-300">
+              เส้นทางสายมอเตอร์เวย์ (สาย 7) สภาวะปกติ รถบรรทุกเหล็กสามารถเดินทางได้ตามแผนงาน
+            </p>
+          </div>
+        `;
+      }
+    }
+
+    // Analyze BOM & Line Revenue Impact
+    function analyzeBOMImpact() {
+      const supplier = document.getElementById('bom-supplier-select').value;
+      const cutoffDays = parseInt(document.getElementById('cutoff-days-range').value);
+
+      document.getElementById('val-cutoff-days').innerText = `${cutoffDays} วัน`;
+
+      let bufferDays = 3;
+      let dailyLoss = 2500000;
+      let mitigationText = "";
+
+      if (supplier === 'suppA') {
+        bufferDays = 3;
+        dailyLoss = 2500000;
+        mitigationText = "อนุมัติจัดซื้อด่วนจากซัพพลายเออร์สำรอง (Backup Supplier: Taiwan Micro Inc.) โดยยอมรับส่วนต่างราคา +8% เพื่อป้องกันสายการผลิตหยุดชะงัก";
+      } else if (supplier === 'suppB') {
+        bufferDays = 5;
+        dailyLoss = 1800000;
+        mitigationText = "ปรับสลับลำดับแผนการผลิต (Reschedule Line B2) ไปผลิตตู้ไฟฟ้ารุ่นถัดไปที่มีวัตถุดิบสำรองพร้อมใช้งาน";
+      } else {
+        bufferDays = 2;
+        dailyLoss = 1200000;
+        mitigationText = "ดึงสต็อกเม็ดพลาสติกจากคลังสาขาอมตะซิตี้เข้ามาทดแทนชั่วคราว";
+      }
+
+      const stopDays = Math.max(0, cutoffDays - bufferDays);
+      const totalLoss = stopDays * dailyLoss;
+
+      document.getElementById('res-buffer-stock').innerText = `${bufferDays} วัน`;
+      document.getElementById('res-stop-days').innerText = `${stopDays} วัน`;
+      document.getElementById('res-daily-loss').innerText = `฿ ${dailyLoss.toLocaleString()}`;
+      document.getElementById('res-total-loss').innerText = `฿ ${totalLoss.toLocaleString()}`;
+      document.getElementById('mitigation-text').innerText = mitigationText;
+    }
+
+    // Modal Control & Helper Functions
+    function showAlert(msg) {
+      document.getElementById('modal-message').innerText = msg;
+      document.getElementById('app-modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('app-modal').classList.add('hidden');
+    }
+
+    function showSensorModal(sensorName) {
+      showAlert(`ดูรายละเอียดข้อมูลสดเรียลไทม์ และสถิติย้อนหลังของเซนเซอร์: ${sensorName}`);
+    }
+
+    function togglePump(gateName) {
+      showAlert(`สั่งการผ่าน IoT: เปิดปั๊มน้ำระบายฉุกเฉินประจำประตูน้ำ ${gateName} เรียบร้อยแล้ว`);
+    }
+
+    function triggerEmergencyProtocol() {
+      showAlert("ประกาศเตือนภัยเตรียมย้ายทรัพย์สินและเครื่องจักรขึ้นที่สูง (Level 2 Protocol Activated)");
+    }
+
+    // Initialize Page on Load
+    window.onload = function() {
+      startRealtimeSimulation();
+      updateSimulation();
+      analyzeBOMImpact();
+    };
+  </script>
+</body>
+</html>
